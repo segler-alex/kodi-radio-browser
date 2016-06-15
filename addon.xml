@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.audio.radiobrowser" name="Radio-Browser.info" version="1.0" provider-name="Ich">
+  <requires>
+    <import addon="xbmc.python" version="2.0"/>
+  </requires>
+  <extension point="xbmc.python.pluginsource" library="main.py">
+    <provides>audio</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <language>de</language>
+    <platform>all</platform>
+    <summary lang="de">Radio-Browser</summary>
+    <description lang="de">Verzeichnis von Radio-Stationen das www.radio-browser.info als Quelle nutzt</description>
+  </extension>
+</addon>
