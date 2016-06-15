@@ -17,10 +17,10 @@ xbmcplugin.setContent(addon_handle, 'songs')
 def build_url(query):
     return base_url + '?' + urllib.urlencode(query)
 
-def addLink(addon_handle, name, url, favicon, bitrate):
+def addLink(addon_handle, stationid, name, url, favicon, bitrate):
     li = xbmcgui.ListItem(name, iconImage=favicon)
     li.setInfo(type="Music", infoLabels={ "Title":name, "Size":bitrate})
-    localUrl = build_url({'mode': 'play', 'url': url})
+    localUrl = build_url({'mode': 'play', 'stationid': stationid})
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li)
 
 def downloadFile(uri):
@@ -51,9 +51,12 @@ elif mode[0] == 'folder':
     data = downloadFile(uri)
     dataDecoded = json.loads(data)
     for station in dataDecoded:
-        addLink(addon_handle, station['name'], station['url'], station['favicon'], station['bitrate'])
+        addLink(addon_handle, station['id'], station['name'], station['url'], station['favicon'], station['bitrate'])
     xbmcplugin.endOfDirectory(addon_handle)
 
 elif mode[0] == 'play':
-    uri = args['url'][0]
+    stationid = args['stationid'][0]
+    data = downloadFile('http://www.radio-browser.info/webservice/v2/json/url/'+str(stationid))
+    dataDecoded = json.loads(data)
+    uri = dataDecoded['url']
     xbmc.Player().play(uri)
