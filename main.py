@@ -27,25 +27,46 @@ def downloadFile(uri):
     req = urllib2.Request(uri)
     req.add_header('User-Agent', 'KodiRadioBrowser/1.0')
     response = urllib2.urlopen(req)
-    data=response.read()
+    data=response.read().decode('utf-8')
+    # print(data)
     response.close()
     return data
 
 mode = args.get('mode', None)
 
 if mode is None:
-    url = build_url({'mode': 'folder', 'foldername': 'topclick', 'url': 'http://www.radio-browser.info/webservice/json/stations/topclick/100'})
+    localUrl = build_url({'mode': 'stations', 'url': 'http://www.radio-browser.info/webservice/json/stations/topclick/100'})
     li = xbmcgui.ListItem('Top 100 Stations', iconImage='DefaultFolder.png')
-    xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
+    xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
 
-    url = build_url({'mode': 'folder', 'foldername': 'topvote', 'url': 'http://www.radio-browser.info/webservice/json/stations/topvote/100'})
+    localUrl = build_url({'mode': 'stations', 'url': 'http://www.radio-browser.info/webservice/json/stations/topvote/100'})
     li = xbmcgui.ListItem('Top 100 Voted Stations', iconImage='DefaultFolder.png')
-    xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
+    xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
+
+    localUrl = build_url({'mode': 'tags'})
+    li = xbmcgui.ListItem('Tags', iconImage='DefaultFolder.png')
+    xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
 
     xbmcplugin.endOfDirectory(addon_handle)
 
-elif mode[0] == 'folder':
-    foldername = args['foldername'][0]
+elif mode[0] == 'tags':
+    data = downloadFile('http://www.radio-browser.info/webservice/json/tags')
+    dataDecoded = json.loads(data)
+    for tag in dataDecoded:
+        tagName = tag['name']
+        if tag['stationcount'] > 1:
+            try:
+                localUrl = build_url({'mode': 'stations', 'url': 'http://www.radio-browser.info/webservice/json/stations/bytagexact/'+tagName})
+                li = xbmcgui.ListItem(tagName, iconImage='DefaultFolder.png')
+                xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
+            except:
+                # print(tagName)
+                # print('ignored tag:'+tagName)
+                pass
+
+    xbmcplugin.endOfDirectory(addon_handle)
+
+elif mode[0] == 'stations':
     uri = args['url'][0]
 
     data = downloadFile(uri)
