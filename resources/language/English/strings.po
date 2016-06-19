@@ -16,7 +16,6 @@ msgstr ""
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-# Menu items
 msgctxt "#30000"
 msgid "Top 100 clicked stations"
 msgstr ""
