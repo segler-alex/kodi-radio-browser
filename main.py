@@ -47,6 +47,14 @@ if mode is None:
     li = xbmcgui.ListItem('Top 100 Voted Stations', iconImage='DefaultFolder.png')
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
 
+    localUrl = build_url({'mode': 'stations', 'url': 'http://www.radio-browser.info/webservice/json/stations/lastchange/100'})
+    li = xbmcgui.ListItem('Last 100 changed stations', iconImage='DefaultFolder.png')
+    xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
+
+    localUrl = build_url({'mode': 'stations', 'url': 'http://www.radio-browser.info/webservice/json/stations/lastclick/100'})
+    li = xbmcgui.ListItem('Last 100 clicked stations', iconImage='DefaultFolder.png')
+    xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
+
     localUrl = build_url({'mode': 'tags'})
     li = xbmcgui.ListItem('Tags', iconImage='DefaultFolder.png')
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
