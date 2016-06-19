@@ -16,30 +16,30 @@ msgstr ""
 "Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgctxt "#30000"
+msgctxt "#32000"
 msgid "Top 100 clicked stations"
 msgstr "Top 100 Stationen nach Klicks"
 
-msgctxt "#30001"
+msgctxt "#32001"
 msgid "Top 100 voted stations"
 msgstr "Top 100 Stationen nach Abstimmung"
 
-msgctxt "#30002"
+msgctxt "#32002"
 msgid "Last 100 changed stations"
 msgstr "100 letzt-geänderte Stationen"
 
-msgctxt "#30003"
+msgctxt "#32003"
 msgid "Last 100 clicked stations"
 msgstr "100 letzt-geklickte Stationen"
 
-msgctxt "#30004"
+msgctxt "#32004"
 msgid "Tags"
 msgstr "Kategorien"
 
-msgctxt "#30005"
+msgctxt "#32005"
 msgstr "Länder"
 msgid "Countries"
 
-msgctxt "#30006"
+msgctxt "#32006"
 msgid "All"
 msgstr "Alle"
