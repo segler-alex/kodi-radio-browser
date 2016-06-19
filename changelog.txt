@@ -1,2 +1,2 @@
-v0.1 (2016-06-15)
-- First working version with 2 lists
+v0.1 (2016-06-19)
+- First working version with basic lists for tags, countries, top 100s
