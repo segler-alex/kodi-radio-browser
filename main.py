@@ -11,8 +11,6 @@ base_url = sys.argv[0]
 addon_handle = int(sys.argv[1])
 args = urlparse.parse_qs(sys.argv[2][1:])
 
-print("Addon_HANDLe:"+str(addon_handle))
-
 xbmcplugin.setContent(addon_handle, 'songs')
 
 def build_url(query):
@@ -24,12 +22,17 @@ def addLink(addon_handle, stationid, name, url, favicon, bitrate):
     localUrl = build_url({'mode': 'play', 'stationid': stationid})
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li)
 
-def downloadFile(uri):
-    req = urllib2.Request(uri)
+def downloadFile(uri, param):
+    paramEncoded = None
+    if param != None:
+        paramEncoded = json.dumps(param)
+
+    req = urllib2.Request(uri, paramEncoded)
     req.add_header('User-Agent', 'KodiRadioBrowser/1.0')
+    req.add_header('Content-Type', 'application/json')
     response = urllib2.urlopen(req)
-    data=response.read().decode('utf-8')
-    # print(data)
+    data=response.read()
+
     response.close()
     return data
 
@@ -55,68 +58,74 @@ if mode is None:
     xbmcplugin.endOfDirectory(addon_handle)
 
 elif mode[0] == 'tags':
-    data = downloadFile('http://www.radio-browser.info/webservice/json/tags')
+    data = downloadFile('http://www.radio-browser.info/webservice/json/tags', None)
     dataDecoded = json.loads(data)
     for tag in dataDecoded:
         tagName = tag['name']
-        if tag['stationcount'] > 1:
+        if int(tag['stationcount']) > 1:
             try:
-                localUrl = build_url({'mode': 'stations', 'url': 'http://www.radio-browser.info/webservice/json/stations/bytagexact/', 'value' : base64.b32encode(tagName)})
+                localUrl = build_url({'mode': 'stations', 'key': 'tag', 'value' : base64.b32encode(tagName.encode('utf-8'))})
                 li = xbmcgui.ListItem(tagName, iconImage='DefaultFolder.png')
                 xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
-            except:
-                # print('ignored tag:'+tagName)
+            except Exception, e:
+                print(e)
                 pass
 
     xbmcplugin.endOfDirectory(addon_handle)
 
 elif mode[0] == 'countries':
-    data = downloadFile('http://www.radio-browser.info/webservice/json/countries')
+    data = downloadFile('http://www.radio-browser.info/webservice/json/countries', None)
     dataDecoded = json.loads(data)
     for tag in dataDecoded:
         countryName = tag['name']
-        if tag['stationcount'] > 1:
+        if int(tag['stationcount']) > 1:
             try:
-                localUrl = build_url({'mode': 'states', 'country': countryName})
+                localUrl = build_url({'mode': 'states', 'country': base64.b32encode(countryName.encode('utf-8'))})
                 li = xbmcgui.ListItem(countryName, iconImage='DefaultFolder.png')
                 xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
-            except:
-                # print('ignored tag:'+tagName)
+            except Exception, e:
+                print(e)
                 pass
 
     xbmcplugin.endOfDirectory(addon_handle)
 
 elif mode[0] == 'states':
     country = args['country'][0]
+    country = base64.b32decode(country)
+    country = country.decode('utf-8')
 
-    data = downloadFile('http://www.radio-browser.info/webservice/json/states/'+urllib.quote(country)+'/')
+    data = downloadFile('http://www.radio-browser.info/webservice/json/states/'+urllib.quote(country)+'/', None)
     dataDecoded = json.loads(data)
 
-    localUrl = build_url({'mode': 'stations', 'url': 'http://www.radio-browser.info/webservice/json/stations/bycountryexact/', 'value':base64.b32encode(country)})
+    localUrl = build_url({'mode': 'stations', 'key': 'country', 'value': base64.b32encode(country.encode('utf-8'))})
     li = xbmcgui.ListItem("All", iconImage='DefaultFolder.png')
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
 
     for tag in dataDecoded:
         stateName = tag['name']
-        if tag['stationcount'] > 1:
+        if int(tag['stationcount']) > 1:
             try:
-                localUrl = build_url({'mode': 'stations', 'url': 'http://www.radio-browser.info/webservice/json/stations/bystateexact/','value':base64.b32encode(stateName)})
+                localUrl = build_url({'mode': 'stations', 'key': 'state','value':base64.b32encode(stateName.encode('utf-8'))})
                 li = xbmcgui.ListItem(stateName, iconImage='DefaultFolder.png')
                 xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
-            except:
-                # print('ignored tag:'+tagName)
+            except Exception, e:
+                print(e)
                 pass
 
     xbmcplugin.endOfDirectory(addon_handle)
 
 elif mode[0] == 'stations':
-    uri = args['url'][0]
+    url = 'http://www.radio-browser.info/webservice/json/stations/search'
+    param = None
+    if 'url' in args:
+        url = args['url'][0]
+    else:
+        key = args['key'][0]
+        value = base64.b32decode(args['value'][0])
+        value = value.decode('utf-8')
+        param = dict({key:value})
 
-    if 'value' in args:
-        value = args['value'][0]
-        uri = uri + urllib.quote(base64.b32decode(value))
-
-    data = downloadFile(uri)
+    data = downloadFile(url, param)
     dataDecoded = json.loads(data)
     for station in dataDecoded:
         addLink(addon_handle, station['id'], station['name'], station['url'], station['favicon'], station['bitrate'])
@@ -124,7 +133,7 @@ elif mode[0] == 'stations':
 
 elif mode[0] == 'play':
     stationid = args['stationid'][0]
-    data = downloadFile('http://www.radio-browser.info/webservice/v2/json/url/'+str(stationid))
+    data = downloadFile('http://www.radio-browser.info/webservice/v2/json/url/'+str(stationid),None)
     dataDecoded = json.loads(data)
     uri = dataDecoded['url']
     xbmc.Player().play(uri)
