@@ -43,3 +43,7 @@ msgid "Countries"
 msgctxt "#32006"
 msgid "All"
 msgstr "Alle"
+
+msgctxt "#32007"
+msgid "Suchen..."
+msgstr ""

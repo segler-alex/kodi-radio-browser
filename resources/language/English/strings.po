@@ -43,3 +43,7 @@ msgstr ""
 msgctxt "#32006"
 msgid "All"
 msgstr ""
+
+msgctxt "#32007"
+msgid "Search..."
+msgstr ""
