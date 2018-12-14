@@ -45,6 +45,11 @@ def downloadFile(uri, param):
     response.close()
     return data
 
+def addPlayableLink(data):
+    dataDecoded = json.loads(data)
+    for station in dataDecoded:
+        addLink(addon_handle, station['id'], station['name'], station['url'], station['favicon'], station['bitrate'])
+
 mode = args.get('mode', None)
 
 if mode is None:
@@ -70,6 +75,10 @@ if mode is None:
 
     localUrl = build_url({'mode': 'countries'})
     li = xbmcgui.ListItem(LANGUAGE(32005), iconImage='DefaultFolder.png')
+    xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
+
+    localUrl = build_url({'mode': 'search'})
+    li = xbmcgui.ListItem(LANGUAGE(32007), iconImage='DefaultFolder.png')
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
 
     xbmcplugin.endOfDirectory(addon_handle)
@@ -143,9 +152,7 @@ elif mode[0] == 'stations':
         param = dict({key:value})
 
     data = downloadFile(url, param)
-    dataDecoded = json.loads(data)
-    for station in dataDecoded:
-        addLink(addon_handle, station['id'], station['name'], station['url'], station['favicon'], station['bitrate'])
+    addPlayableLink(data)
     xbmcplugin.endOfDirectory(addon_handle)
 
 elif mode[0] == 'play':
@@ -154,3 +161,13 @@ elif mode[0] == 'play':
     dataDecoded = json.loads(data)
     uri = dataDecoded['url']
     xbmc.Player().play(uri)
+
+elif mode[0] == 'search':
+    dialog = xbmcgui.Dialog()
+    d = dialog.input('Enter secret code', type=xbmcgui.INPUT_ALPHANUM)
+
+    url = 'http://www.radio-browser.info/webservice/json/stations/byname/'+d
+    data = downloadFile(url, None)
+    addPlayableLink(data)
+
+    xbmcplugin.endOfDirectory(addon_handle)
