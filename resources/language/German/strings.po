@@ -52,3 +52,7 @@ msgctxt "#32008"
 msgid "Meine Sender"
 msgstr ""
 
+msgctxt "#32009"
+msgid "Sender hinzufügen"
+msgstr ""
+

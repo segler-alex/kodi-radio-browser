@@ -34,6 +34,10 @@ def addLink(addon_handle, stationid, name, url, favicon, bitrate):
     li = xbmcgui.ListItem(name, iconImage=favicon)
     li.setInfo(type="Music", infoLabels={ "Title":name, "Size":bitrate})
     localUrl = build_url({'mode': 'play', 'stationid': stationid})
+    contextUrl = build_url({'mode': 'addstation', 'id': stationid, 'name': name.encode('utf-8'), 'url': url, 'favicon': favicon, 'bitrate': bitrate})
+    # .encode('utf-8')
+    li.addContextMenuItems([(LANGUAGE(32009),'RunPlugin(%s)'%(contextUrl))])
+    
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li)
 
 def downloadFile(uri, param):
@@ -63,15 +67,9 @@ def writeFile(file_path, data):
     with open(file_path, 'w') as write_file:
         return json.dump(data, write_file)
 
-def add_to_my_stations(station_id):
-    data = downloadFile('http://www.radio-browser.info/webservice/v2/json/url/'+str(station_id),None)
-    station = json.loads(data)
-    my_stations.append(station)
+def add_to_my_stations(station_id, name, url, favicon, bitrate):
+    my_stations.append({'id': station_id, 'name': name, 'url': url, 'bitrate': bitrate, 'favicon': favicon})
     writeFile(mystations_path, my_stations)
-    
-    # station = radio_api.get_station_by_station_id(station_id)
-    # my_stations[station_id] = station
-    # my_stations.sync()
 
 # def del_from_my_stations(station_id):
 #     if station_id in my_stations:
@@ -86,9 +84,6 @@ if xbmcvfs.exists(mystations_path):
     my_stations = readFile(mystations_path)
 else:
     writeFile(mystations_path, my_stations)
-
-# if not xbmcvfs.exists(mystations_path):
-#     my_stations = writeFile(mystations_path, my_stations)
 
 mode = args.get('mode', None)
 
@@ -201,7 +196,7 @@ elif mode[0] == 'stations':
 
 elif mode[0] == 'play':
     stationid = args['stationid'][0]
-    add_to_my_stations(stationid)
+    #add_to_my_stations(stationid)
     data = downloadFile('http://www.radio-browser.info/webservice/v2/json/url/'+str(stationid),None)
     dataDecoded = json.loads(data)
     uri = dataDecoded['url']
@@ -218,9 +213,10 @@ elif mode[0] == 'search':
     xbmcplugin.endOfDirectory(addon_handle)
 
 elif mode[0] == 'mystations':
-    # data = readFile(mystations_path)
-    # dataDecoded = json.loads(data)
     for station in my_stations:
         addLink(addon_handle, station['id'], station['name'], station['url'], station['favicon'], station['bitrate'])
 
     xbmcplugin.endOfDirectory(addon_handle)
+
+elif mode[0] == 'addstation':
+    add_to_my_stations(args['id'][0], args['name'][0], args['url'][0], args['favicon'][0], args['bitrate'][0])
