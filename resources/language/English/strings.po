@@ -47,3 +47,7 @@ msgstr ""
 msgctxt "#32007"
 msgid "Search..."
 msgstr ""
+
+msgctxt "#32008"
+msgid "My Stations"
+msgstr ""

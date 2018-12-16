@@ -47,3 +47,8 @@ msgstr "Alle"
 msgctxt "#32007"
 msgid "Suchen..."
 msgstr ""
+
+msgctxt "#32008"
+msgid "Meine Sender"
+msgstr ""
+

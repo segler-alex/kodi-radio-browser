@@ -5,6 +5,7 @@ import urlparse
 import xbmcgui
 import xbmcplugin
 import xbmcaddon
+import xbmcvfs
 import json
 import base64
 
@@ -16,6 +17,10 @@ addon_handle = int(sys.argv[1])
 args = urlparse.parse_qs(sys.argv[2][1:])
 
 xbmcplugin.setContent(addon_handle, 'songs')
+
+my_stations = []
+profile = xbmc.translatePath( addon.getAddonInfo('profile') ).decode("utf-8")
+mystations_path = profile+'/mystations.json'
 
 def LANGUAGE(id):
     # return id
@@ -50,6 +55,41 @@ def addPlayableLink(data):
     for station in dataDecoded:
         addLink(addon_handle, station['id'], station['name'], station['url'], station['favicon'], station['bitrate'])
 
+def readFile(file_path):
+    with open(file_path, 'r') as read_file:
+        return json.load(read_file)
+
+def writeFile(file_path, data):
+    with open(file_path, 'w') as write_file:
+        return json.dump(data, write_file)
+
+def add_to_my_stations(station_id):
+    data = downloadFile('http://www.radio-browser.info/webservice/v2/json/url/'+str(station_id),None)
+    station = json.loads(data)
+    my_stations.append(station)
+    writeFile(mystations_path, my_stations)
+    
+    # station = radio_api.get_station_by_station_id(station_id)
+    # my_stations[station_id] = station
+    # my_stations.sync()
+
+# def del_from_my_stations(station_id):
+#     if station_id in my_stations:
+#         del my_stations[station_id]
+#         my_stations.sync()
+
+# create storage
+if not xbmcvfs.exists(profile):
+    xbmcvfs.mkdir(profile)
+
+if xbmcvfs.exists(mystations_path):
+    my_stations = readFile(mystations_path)
+else:
+    writeFile(mystations_path, my_stations)
+
+# if not xbmcvfs.exists(mystations_path):
+#     my_stations = writeFile(mystations_path, my_stations)
+
 mode = args.get('mode', None)
 
 if mode is None:
@@ -79,6 +119,10 @@ if mode is None:
 
     localUrl = build_url({'mode': 'search'})
     li = xbmcgui.ListItem(LANGUAGE(32007), iconImage='DefaultFolder.png')
+    xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
+
+    localUrl = build_url({'mode': 'mystations'})
+    li = xbmcgui.ListItem(LANGUAGE(32008), iconImage='DefaultFolder.png')
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
 
     xbmcplugin.endOfDirectory(addon_handle)
@@ -157,6 +201,7 @@ elif mode[0] == 'stations':
 
 elif mode[0] == 'play':
     stationid = args['stationid'][0]
+    add_to_my_stations(stationid)
     data = downloadFile('http://www.radio-browser.info/webservice/v2/json/url/'+str(stationid),None)
     dataDecoded = json.loads(data)
     uri = dataDecoded['url']
@@ -169,5 +214,13 @@ elif mode[0] == 'search':
     url = 'http://www.radio-browser.info/webservice/json/stations/byname/'+d
     data = downloadFile(url, None)
     addPlayableLink(data)
+
+    xbmcplugin.endOfDirectory(addon_handle)
+
+elif mode[0] == 'mystations':
+    # data = readFile(mystations_path)
+    # dataDecoded = json.loads(data)
+    for station in my_stations:
+        addLink(addon_handle, station['id'], station['name'], station['url'], station['favicon'], station['bitrate'])
 
     xbmcplugin.endOfDirectory(addon_handle)
