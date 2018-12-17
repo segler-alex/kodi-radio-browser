@@ -44,3 +44,19 @@ msgstr "Държави"
 msgctxt "#32006"
 msgid "All"
 msgstr "Всички"
+
+msgctxt "#32007"
+msgid "Търсене..."
+msgstr ""
+
+msgctxt "#32008"
+msgid "Моите станции"
+msgstr ""
+
+msgctxt "#32009"
+msgid "Премахване на станцията"
+msgstr ""
+
+msgctxt "#32010"
+msgid "Добавете станция"
+msgstr ""

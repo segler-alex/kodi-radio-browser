@@ -5,6 +5,7 @@ import urlparse
 import xbmcgui
 import xbmcplugin
 import xbmcaddon
+import xbmcvfs
 import json
 import base64
 
@@ -16,6 +17,10 @@ addon_handle = int(sys.argv[1])
 args = urlparse.parse_qs(sys.argv[2][1:])
 
 xbmcplugin.setContent(addon_handle, 'songs')
+
+my_stations = {}
+profile = xbmc.translatePath(addon.getAddonInfo('profile')).decode("utf-8")
+mystations_path = profile+'/mystations.json'
 
 def LANGUAGE(id):
     # return id
@@ -29,6 +34,16 @@ def addLink(addon_handle, stationid, name, url, favicon, bitrate):
     li = xbmcgui.ListItem(name, iconImage=favicon)
     li.setInfo(type="Music", infoLabels={ "Title":name, "Size":bitrate})
     localUrl = build_url({'mode': 'play', 'stationid': stationid})
+    
+    if stationid in my_stations:
+        contextTitle = LANGUAGE(32009)
+        contextUrl = build_url({'mode': 'delstation', 'id': stationid})
+    else:
+        contextTitle = LANGUAGE(32010)
+        contextUrl = build_url({'mode': 'addstation', 'id': stationid, 'name': name.encode('utf-8'), 'url': url, 'favicon': favicon, 'bitrate': bitrate})
+
+    li.addContextMenuItems([(contextTitle, 'RunPlugin(%s)'%(contextUrl))])
+
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li)
 
 def downloadFile(uri, param):
@@ -49,6 +64,33 @@ def addPlayableLink(data):
     dataDecoded = json.loads(data)
     for station in dataDecoded:
         addLink(addon_handle, station['id'], station['name'], station['url'], station['favicon'], station['bitrate'])
+
+def readFile(filepath):
+    with open(filepath, 'r') as read_file:
+        return json.load(read_file)
+
+def writeFile(filepath, data):
+    with open(filepath, 'w') as write_file:
+        return json.dump(data, write_file)
+
+def addToMyStations(stationid, name, url, favicon, bitrate):
+    my_stations[stationid] = {'id': stationid, 'name': name, 'url': url, 'bitrate': bitrate, 'favicon': favicon}
+    writeFile(mystations_path, my_stations)
+
+def delFromMyStations(stationid):
+    if stationid in my_stations:
+        del my_stations[stationid]
+        writeFile(mystations_path, my_stations)
+        xbmc.executebuiltin('Container.Refresh')
+
+# create storage
+if not xbmcvfs.exists(profile):
+    xbmcvfs.mkdir(profile)
+
+if xbmcvfs.exists(mystations_path):
+    my_stations = readFile(mystations_path)
+else:
+    writeFile(mystations_path, my_stations)
 
 mode = args.get('mode', None)
 
@@ -79,6 +121,10 @@ if mode is None:
 
     localUrl = build_url({'mode': 'search'})
     li = xbmcgui.ListItem(LANGUAGE(32007), iconImage='DefaultFolder.png')
+    xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
+
+    localUrl = build_url({'mode': 'mystations'})
+    li = xbmcgui.ListItem(LANGUAGE(32008), iconImage='DefaultFolder.png')
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
 
     xbmcplugin.endOfDirectory(addon_handle)
@@ -171,3 +217,16 @@ elif mode[0] == 'search':
     addPlayableLink(data)
 
     xbmcplugin.endOfDirectory(addon_handle)
+
+elif mode[0] == 'mystations':
+    for station in my_stations.values():
+        addLink(addon_handle, station['id'], station['name'], station['url'], station['favicon'], station['bitrate'])
+
+    xbmcplugin.endOfDirectory(addon_handle)
+
+elif mode[0] == 'addstation':
+    favicon = args['favicon'][0] if 'favicon' in args else ''
+    addToMyStations(args['id'][0], args['name'][0], args['url'][0], favicon, args['bitrate'][0])
+
+elif mode[0] == 'delstation':
+    delFromMyStations(args['id'][0])
