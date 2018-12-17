@@ -59,3 +59,7 @@ msgstr ""
 msgctxt "#32010"
 msgid "Add Station"
 msgstr ""
+
+msgctxt "#32011"
+msgid "Search Station"
+msgstr ""

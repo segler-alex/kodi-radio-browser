@@ -210,7 +210,7 @@ elif mode[0] == 'play':
 
 elif mode[0] == 'search':
     dialog = xbmcgui.Dialog()
-    d = dialog.input('Enter secret code', type=xbmcgui.INPUT_ALPHANUM)
+    d = dialog.input(LANGUAGE(32011), type=xbmcgui.INPUT_ALPHANUM)
 
     url = 'http://www.radio-browser.info/webservice/json/stations/byname/'+d
     data = downloadFile(url, None)
