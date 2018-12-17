@@ -60,3 +60,7 @@ msgstr ""
 msgctxt "#32010"
 msgid "Добавете станция"
 msgstr ""
+
+msgctxt "#32011"
+msgid "Търсене на станции"
+msgstr ""

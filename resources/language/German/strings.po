@@ -60,3 +60,6 @@ msgctxt "#32010"
 msgid "Sender hinzufügen"
 msgstr ""
 
+msgctxt "#32011"
+msgid "Sender suchen"
+msgstr ""
