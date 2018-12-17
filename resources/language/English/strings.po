@@ -53,5 +53,9 @@ msgid "My Stations"
 msgstr ""
 
 msgctxt "#32009"
-msgid "Add Stations"
+msgid "Remove Station"
+msgstr ""
+
+msgctxt "#32010"
+msgid "Add Station"
 msgstr ""
