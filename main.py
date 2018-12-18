@@ -34,7 +34,7 @@ def addLink(addon_handle, stationid, name, url, favicon, bitrate):
     li = xbmcgui.ListItem(name, iconImage=favicon)
     li.setInfo(type="Music", infoLabels={ "Title":name, "Size":bitrate})
     localUrl = build_url({'mode': 'play', 'stationid': stationid})
-    
+
     if stationid in my_stations:
         contextTitle = LANGUAGE(32009)
         contextUrl = build_url({'mode': 'delstation', 'id': stationid})
@@ -52,7 +52,7 @@ def downloadFile(uri, param):
         paramEncoded = json.dumps(param)
 
     req = urllib2.Request(uri, paramEncoded)
-    req.add_header('User-Agent', 'KodiRadioBrowser/1.0')
+    req.add_header('User-Agent', 'KodiRadioBrowser/1.0.0')
     req.add_header('Content-Type', 'application/json')
     response = urllib2.urlopen(req)
     data=response.read()
