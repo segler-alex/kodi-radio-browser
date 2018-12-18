@@ -52,7 +52,7 @@ def downloadFile(uri, param):
         paramEncoded = json.dumps(param)
 
     req = urllib2.Request(uri, paramEncoded)
-    req.add_header('User-Agent', 'KodiRadioBrowser/1.0.0')
+    req.add_header('User-Agent', 'KodiRadioBrowser/1.1.0')
     req.add_header('Content-Type', 'application/json')
     response = urllib2.urlopen(req)
     data=response.read()
