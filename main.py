@@ -52,7 +52,7 @@ def downloadFile(uri, param):
         paramEncoded = json.dumps(param)
 
     req = urllib2.Request(uri, paramEncoded)
-    req.add_header('User-Agent', 'KodiRadioBrowser/1.1.0')
+    req.add_header('User-Agent', 'KodiRadioBrowser/1.1.1')
     req.add_header('Content-Type', 'application/json')
     response = urllib2.urlopen(req)
     data=response.read()
@@ -212,7 +212,7 @@ elif mode[0] == 'search':
     dialog = xbmcgui.Dialog()
     d = dialog.input(LANGUAGE(32011), type=xbmcgui.INPUT_ALPHANUM)
 
-    url = 'http://www.radio-browser.info/webservice/json/stations/byname/'+d
+    url = 'http://www.radio-browser.info/webservice/json/stations/byname/'+urllib.quote(d)
     data = downloadFile(url, None)
     addPlayableLink(data)
 
