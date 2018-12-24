@@ -11,9 +11,9 @@
     <summary lang="en">Radio-Browser</summary>
     <summary lang="bg">Radio-Browser</summary>
     <summary lang="de">Radio-Browser</summary>
-    <description lang="en">Directory of radio stations that uses www.radio-browser.info as source.
+  <description lang="en">This is a client for Radio-Browser.info (a public database of internet radio stations and streaming media channels).  If your channel is not found here, you can add it to the database at Radio-Browser.info ('New station' menu)
 
-If you miss your favourite station, just go to www.radio-browser.info and add it yourself. It is a wiki like system.</description>
+Note: The server may not retain stations which are geo-locked, or do not provide a continuous live stream.</description>
     <description lang="bg">Колекция от радио станции, с източник www.radio-browser.info
 
 Ако любимата ви станция не е в списъка, можете да я добавите като посетите www.radio-browser.info</description>
