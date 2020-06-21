@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.audio.radiobrowser" name="Radio-Browser.info" version="1.1.1" provider-name="sailor">
+<addon id="plugin.audio.radiobrowser" name="Radio-Browser.info" version="1.2.0" provider-name="sailor">
   <requires>
     <import addon="xbmc.python" version="2.24.0"/>
   </requires>
@@ -11,9 +11,9 @@
     <summary lang="en">Radio-Browser</summary>
     <summary lang="bg">Radio-Browser</summary>
     <summary lang="de">Radio-Browser</summary>
-    <description lang="en">This is a client for Radio-Browser.info (a public database of internet radio stations and streaming media channels). If your channel is not found, you can add it to the database at Radio-Browser.info ('New station' menu)
+    <description lang="en">Directory of radio stations that uses www.radio-browser.info as source.
 
-      Note: the database server may not retain stations which do not provide a continuous live stream, or stations which are geo-locked.</description>
+If you miss your favourite station, just go to www.radio-browser.info and add it yourself. It is a wiki like system.</description>
     <description lang="bg">Колекция от радио станции, с източник www.radio-browser.info
 
 Ако любимата ви станция не е в списъка, можете да я добавите като посетите www.radio-browser.info</description>
