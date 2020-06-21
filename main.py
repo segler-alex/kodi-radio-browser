@@ -49,7 +49,6 @@ def get_radiobrowser_base_urls():
 
     # sort list of names
     random.shuffle(hosts)
-    hosts.sort()
     # add "https://" in front to make it an url
     xbmc.log("Found hosts: " + ",".join(hosts))
     return list(map(lambda x: "https://" + x, hosts))
@@ -62,8 +61,9 @@ def LANGUAGE(id):
 def build_url(query):
     return base_url + '?' + urllib.urlencode(query)
 
-def addLink(addon_handle, stationuuid, name, url, favicon, bitrate):
+def addLink(stationuuid, name, url, favicon, bitrate):
     li = xbmcgui.ListItem(name, iconImage=favicon)
+    li.setProperty('IsPlayable', 'true')
     li.setInfo(type="Music", infoLabels={ "Title":name, "Size":bitrate})
     localUrl = build_url({'mode': 'play', 'stationuuid': stationuuid})
 
@@ -76,7 +76,7 @@ def addLink(addon_handle, stationuuid, name, url, favicon, bitrate):
 
     li.addContextMenuItems([(contextTitle, 'RunPlugin(%s)'%(contextUrl))])
 
-    xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li)
+    xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=False)
 
 def downloadFile(uri, param):
     """
@@ -129,7 +129,7 @@ def downloadApiFile(path, param):
 def addPlayableLink(data):
     dataDecoded = json.loads(data)
     for station in dataDecoded:
-        addLink(addon_handle, station['stationuuid'], station['name'], station['url'], station['favicon'], station['bitrate'])
+        addLink(station['stationuuid'], station['name'], station['url'], station['favicon'], station['bitrate'])
 
 def readFile(filepath):
     with open(filepath, 'r') as read_file:
@@ -274,8 +274,7 @@ elif mode[0] == 'play':
     data = downloadApiFile('/json/url/' + str(stationuuid),None)
     dataDecoded = json.loads(data)
     uri = dataDecoded['url']
-    xbmc.Player().stop()
-    xbmc.Player().play(uri)
+    xbmcplugin.setResolvedUrl(addon_handle, True, xbmcgui.ListItem(path=uri))
 
 elif mode[0] == 'search':
     dialog = xbmcgui.Dialog()
@@ -289,7 +288,7 @@ elif mode[0] == 'search':
 
 elif mode[0] == 'mystations':
     for station in my_stations.values():
-        addLink(addon_handle, station['stationuuid'], station['name'], station['url'], station['favicon'], station['bitrate'])
+        addLink(station['stationuuid'], station['name'], station['url'], station['favicon'], station['bitrate'])
 
     xbmcplugin.endOfDirectory(addon_handle)
 
