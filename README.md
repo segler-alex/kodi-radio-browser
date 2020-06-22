@@ -1,3 +1,3 @@
 # radio-browser.info plugin for kodi
 * https://kodi.tv/
-* https://kodi.wiki/view/Add-on:Radio-Browser.info
+* https://kodi.tv/addon/music-add-ons-plugins/radio-browserinfo
