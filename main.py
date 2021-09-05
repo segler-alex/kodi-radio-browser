@@ -1,7 +1,7 @@
 import sys
-import urllib
-import urllib2
-import urlparse
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
+import urllib.parse
 import xbmcgui
 import xbmcplugin
 import xbmcaddon
@@ -14,12 +14,12 @@ addon = xbmcaddon.Addon(id=addonID)
 
 base_url = sys.argv[0]
 addon_handle = int(sys.argv[1])
-args = urlparse.parse_qs(sys.argv[2][1:])
+args = urllib.parse.parse_qs(sys.argv[2][1:])
 
 xbmcplugin.setContent(addon_handle, 'songs')
 
 my_stations = {}
-profile = xbmc.translatePath(addon.getAddonInfo('profile')).decode("utf-8")
+profile = xbmcvfs.translatePath(addon.getAddonInfo('profile'))
 mystations_path = profile+'/mystations.json'
 
 import socket
@@ -51,7 +51,7 @@ def get_radiobrowser_base_urls():
     random.shuffle(hosts)
     # add "https://" in front to make it an url
     xbmc.log("Found hosts: " + ",".join(hosts))
-    return list(map(lambda x: "https://" + x, hosts))
+    return list(["https://" + x for x in hosts])
 
 def LANGUAGE(id):
     # return id
@@ -59,10 +59,11 @@ def LANGUAGE(id):
     return addon.getLocalizedString(id).encode('utf-8')
 
 def build_url(query):
-    return base_url + '?' + urllib.urlencode(query)
+    return base_url + '?' + urllib.parse.urlencode(query)
 
 def addLink(stationuuid, name, url, favicon, bitrate):
-    li = xbmcgui.ListItem(name, iconImage=favicon)
+    li = xbmcgui.ListItem(name)
+    li.setArt({'icon':favicon})
     li.setProperty('IsPlayable', 'true')
     li.setInfo(type="Music", infoLabels={ "Title":name, "Size":bitrate})
     localUrl = build_url({'mode': 'play', 'stationuuid': stationuuid})
@@ -88,15 +89,15 @@ def downloadFile(uri, param):
     """
     paramEncoded = None
     if param != None:
-        paramEncoded = json.dumps(param)
+        paramEncoded = json.dumps(param).encode("utf-8")
         xbmc.log('Request to ' + uri + ' Params: ' + ','.join(param))
     else:
         xbmc.log('Request to ' + uri)
 
-    req = urllib2.Request(uri, paramEncoded)
-    req.add_header('User-Agent', 'KodiRadioBrowser/1.2.0')
+    req = urllib.request.Request(uri, paramEncoded)
+    req.add_header('User-Agent', 'KodiRadioBrowser/1.3.0')
     req.add_header('Content-Type', 'application/json')
-    response = urllib2.urlopen(req)
+    response = urllib.request.urlopen(req)
     data=response.read()
 
     response.close()
@@ -162,35 +163,43 @@ mode = args.get('mode', None)
 
 if mode is None:
     localUrl = build_url({'mode': 'stations', 'url': '/json/stations/topclick/100'})
-    li = xbmcgui.ListItem(LANGUAGE(32000), iconImage='DefaultFolder.png')
+    li = xbmcgui.ListItem(LANGUAGE(32000))
+    li.setArt({'icon':'DefaultFolder.png'})
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
 
     localUrl = build_url({'mode': 'stations', 'url': '/json/stations/topvote/100'})
-    li = xbmcgui.ListItem(LANGUAGE(32001), iconImage='DefaultFolder.png')
+    li = xbmcgui.ListItem(LANGUAGE(32001))
+    li.setArt({'icon':'DefaultFolder.png'})
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
 
     localUrl = build_url({'mode': 'stations', 'url': '/json/stations/lastchange/100'})
-    li = xbmcgui.ListItem(LANGUAGE(32002), iconImage='DefaultFolder.png')
+    li = xbmcgui.ListItem(LANGUAGE(32002))
+    li.setArt({'icon':'DefaultFolder.png'})
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
 
     localUrl = build_url({'mode': 'stations', 'url': '/json/stations/lastclick/100'})
-    li = xbmcgui.ListItem(LANGUAGE(32003), iconImage='DefaultFolder.png')
+    li = xbmcgui.ListItem(LANGUAGE(32003))
+    li.setArt({'icon':'DefaultFolder.png'})    
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
 
     localUrl = build_url({'mode': 'tags'})
-    li = xbmcgui.ListItem(LANGUAGE(32004), iconImage='DefaultFolder.png')
+    li = xbmcgui.ListItem(LANGUAGE(32004))
+    li.setArt({'icon':'DefaultFolder.png'})    
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
 
     localUrl = build_url({'mode': 'countries'})
-    li = xbmcgui.ListItem(LANGUAGE(32005), iconImage='DefaultFolder.png')
+    li = xbmcgui.ListItem(LANGUAGE(32005))
+    li.setArt({'icon':'DefaultFolder.png'})
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
 
     localUrl = build_url({'mode': 'search'})
-    li = xbmcgui.ListItem(LANGUAGE(32007), iconImage='DefaultFolder.png')
+    li = xbmcgui.ListItem(LANGUAGE(32007))
+    li.setArt({'icon':'DefaultFolder.png'})    
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
 
     localUrl = build_url({'mode': 'mystations'})
-    li = xbmcgui.ListItem(LANGUAGE(32008), iconImage='DefaultFolder.png')
+    li = xbmcgui.ListItem(LANGUAGE(32008))
+    li.setArt({'icon':'DefaultFolder.png'})    
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
 
     xbmcplugin.endOfDirectory(addon_handle)
@@ -203,7 +212,8 @@ elif mode[0] == 'tags':
         if int(tag['stationcount']) > 1:
             try:
                 localUrl = build_url({'mode': 'stations', 'key': 'tag', 'value' : base64.b32encode(tagName.encode('utf-8'))})
-                li = xbmcgui.ListItem(tagName, iconImage='DefaultFolder.png')
+                li = xbmcgui.ListItem(tagName)
+                li.setArt({'icon':'DefaultFolder.png'})
                 xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
             except Exception as e:
                 xbmc.err(e)
@@ -219,7 +229,8 @@ elif mode[0] == 'countries':
         if int(tag['stationcount']) > 1:
             try:
                 localUrl = build_url({'mode': 'states', 'country': base64.b32encode(countryName.encode('utf-8'))})
-                li = xbmcgui.ListItem(countryName, iconImage='DefaultFolder.png')
+                li = xbmcgui.ListItem(countryName)
+                li.setArt({'icon':'DefaultFolder.png'})
                 xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
             except Exception as e:
                 xbmc.log("Stationcount is not of type int", xbmc.LOGERROR)
@@ -232,11 +243,12 @@ elif mode[0] == 'states':
     country = base64.b32decode(country)
     country = country.decode('utf-8')
 
-    data = downloadApiFile('/json/states/'+urllib.quote(country)+'/', None)
+    data = downloadApiFile('/json/states/'+urllib.parse.quote(country)+'/', None)
     dataDecoded = json.loads(data)
 
     localUrl = build_url({'mode': 'stations', 'key': 'country', 'value': base64.b32encode(country.encode('utf-8'))})
-    li = xbmcgui.ListItem(LANGUAGE(32006), iconImage='DefaultFolder.png')
+    li = xbmcgui.ListItem(LANGUAGE(32006))
+    li.setArt({'icon':'DefaultFolder.png'})
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
 
     for tag in dataDecoded:
@@ -244,7 +256,8 @@ elif mode[0] == 'states':
         if int(tag['stationcount']) > 1:
             try:
                 localUrl = build_url({'mode': 'stations', 'key': 'state','value':base64.b32encode(stateName.encode('utf-8'))})
-                li = xbmcgui.ListItem(stateName, iconImage='DefaultFolder.png')
+                li = xbmcgui.ListItem(stateName)
+                li.setArt({'icon':'DefaultFolder.png'})
                 xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
             except Exception as e:
                 xbmc.log("Stationcount is not of type int", xbmc.LOGERROR)
@@ -287,7 +300,7 @@ elif mode[0] == 'search':
     xbmcplugin.endOfDirectory(addon_handle)
 
 elif mode[0] == 'mystations':
-    for station in my_stations.values():
+    for station in list(my_stations.values()):
         addLink(station['stationuuid'], station['name'], station['url'], station['favicon'], station['bitrate'])
 
     xbmcplugin.endOfDirectory(addon_handle)
