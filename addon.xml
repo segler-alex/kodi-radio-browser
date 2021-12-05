@@ -24,5 +24,9 @@ Vermisst du deine Lieblingsstation? Kein problem: geh auf www.radio-browser.info
     <website>https://www.radio-browser.info</website>
     <source>https://github.com/segler-alex/kodi-radio-browser</source>
     <email>segler_alex@web.de</email>
+    <assets>
+      <icon>icon.png</icon>
+      <fanart>fanart.jpg</fanart>
+    </assets>
   </extension>
 </addon>
