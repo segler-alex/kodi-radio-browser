@@ -1,7 +1,7 @@
 import sys
 import urllib
-import urllib2
-import urlparse
+from urllib.parse import parse_qs, urlencode
+from urllib.request import urlopen, Request
 import xbmcgui
 import xbmcplugin
 import xbmcaddon
@@ -14,12 +14,12 @@ addon = xbmcaddon.Addon(id=addonID)
 
 base_url = sys.argv[0]
 addon_handle = int(sys.argv[1])
-args = urlparse.parse_qs(sys.argv[2][1:])
+args = parse_qs(sys.argv[2][1:])
 
 xbmcplugin.setContent(addon_handle, 'songs')
 
 my_stations = {}
-profile = xbmc.translatePath(addon.getAddonInfo('profile')).decode("utf-8")
+profile = xbmc.translatePath(addon.getAddonInfo('profile'))
 mystations_path = profile+'/mystations.json'
 
 import socket
@@ -59,10 +59,11 @@ def LANGUAGE(id):
     return addon.getLocalizedString(id).encode('utf-8')
 
 def build_url(query):
-    return base_url + '?' + urllib.urlencode(query)
+    return base_url + '?' + urlencode(query)
 
 def addLink(stationuuid, name, url, favicon, bitrate):
-    li = xbmcgui.ListItem(name, iconImage=favicon)
+    li = xbmcgui.ListItem(name)
+    li.setArt({'icon':favicon})
     li.setProperty('IsPlayable', 'true')
     li.setInfo(type="Music", infoLabels={ "Title":name, "Size":bitrate})
     localUrl = build_url({'mode': 'play', 'stationuuid': stationuuid})
@@ -93,10 +94,10 @@ def downloadFile(uri, param):
     else:
         xbmc.log('Request to ' + uri)
 
-    req = urllib2.Request(uri, paramEncoded)
+    req = Request(uri, paramEncoded)
     req.add_header('User-Agent', 'KodiRadioBrowser/1.2.0')
     req.add_header('Content-Type', 'application/json')
-    response = urllib2.urlopen(req)
+    response = urlopen(req)
     data=response.read()
 
     response.close()
@@ -162,35 +163,43 @@ mode = args.get('mode', None)
 
 if mode is None:
     localUrl = build_url({'mode': 'stations', 'url': '/json/stations/topclick/100'})
-    li = xbmcgui.ListItem(LANGUAGE(32000), iconImage='DefaultFolder.png')
+    li = xbmcgui.ListItem(LANGUAGE(32000))
+    li.setArt({'icon':'DefaultFolder.png'})
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
 
     localUrl = build_url({'mode': 'stations', 'url': '/json/stations/topvote/100'})
-    li = xbmcgui.ListItem(LANGUAGE(32001), iconImage='DefaultFolder.png')
+    li = xbmcgui.ListItem(LANGUAGE(32001))
+    li.setArt({'icon':'DefaultFolder.png'})
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
 
     localUrl = build_url({'mode': 'stations', 'url': '/json/stations/lastchange/100'})
-    li = xbmcgui.ListItem(LANGUAGE(32002), iconImage='DefaultFolder.png')
+    li = xbmcgui.ListItem(LANGUAGE(32002))
+    li.setArt({'icon':'DefaultFolder.png'})
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
 
     localUrl = build_url({'mode': 'stations', 'url': '/json/stations/lastclick/100'})
-    li = xbmcgui.ListItem(LANGUAGE(32003), iconImage='DefaultFolder.png')
+    li = xbmcgui.ListItem(LANGUAGE(32003))
+    li.setArt({'icon':'DefaultFolder.png'})
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
 
     localUrl = build_url({'mode': 'tags'})
-    li = xbmcgui.ListItem(LANGUAGE(32004), iconImage='DefaultFolder.png')
+    li = xbmcgui.ListItem(LANGUAGE(32004))
+    li.setArt({'icon':'DefaultFolder.png'})
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
 
     localUrl = build_url({'mode': 'countries'})
-    li = xbmcgui.ListItem(LANGUAGE(32005), iconImage='DefaultFolder.png')
+    li = xbmcgui.ListItem(LANGUAGE(32005))
+    li.setArt({'icon':'DefaultFolder.png'})
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
 
     localUrl = build_url({'mode': 'search'})
-    li = xbmcgui.ListItem(LANGUAGE(32007), iconImage='DefaultFolder.png')
+    li = xbmcgui.ListItem(LANGUAGE(32007))
+    li.setArt({'icon':'DefaultFolder.png'})
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
 
     localUrl = build_url({'mode': 'mystations'})
-    li = xbmcgui.ListItem(LANGUAGE(32008), iconImage='DefaultFolder.png')
+    li = xbmcgui.ListItem(LANGUAGE(32008))
+    li.setArt({'icon':'DefaultFolder.png'})
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=localUrl, listitem=li, isFolder=True)
 
     xbmcplugin.endOfDirectory(addon_handle)
